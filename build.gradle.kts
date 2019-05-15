@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
@@ -31,6 +28,8 @@ dependencies {
     compile("io.ktor:ktor-server-core:$ktor_version")
     compile("io.ktor:ktor-html-builder:$ktor_version")
     compile("org.jetbrains:kotlin-css-jvm:1.0.0-pre.31-kotlin-1.2.41")
+    compile("org.jetbrains.exposed:exposed:0.13.7")
+    compile("org.postgresql:postgresql:42.2.2")
     testCompile("io.ktor:ktor-server-tests:$ktor_version")
 }
 

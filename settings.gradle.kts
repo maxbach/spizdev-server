@@ -1,1 +1,1 @@
-rootProject.name = "spizdev"
+rootProject.name = "spizdev-server"
