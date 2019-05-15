@@ -3,6 +3,7 @@ package ru.touchin.db
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import ru.touchin.db.models.*
 
 object DatabaseController {
     private const val DATABASE_PORT = "5432"

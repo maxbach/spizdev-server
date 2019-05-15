@@ -1,31 +1,91 @@
 package ru.touchin
 
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.http.*
-import io.ktor.html.*
-import kotlinx.html.*
+import com.google.gson.Gson
+import io.ktor.application.Application
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.features.CallLogging
+import io.ktor.features.ContentNegotiation
+import io.ktor.features.DefaultHeaders
+import io.ktor.features.StatusPages
+import io.ktor.gson.gson
+import io.ktor.html.respondHtml
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.request.receiveOrNull
+import io.ktor.response.respond
+import io.ktor.response.respondText
+import io.ktor.routing.get
+import io.ktor.routing.post
+import io.ktor.routing.routing
 import kotlinx.css.*
+import kotlinx.html.*
+import org.jetbrains.exposed.sql.transactions.experimental.transaction
 import ru.touchin.db.DatabaseController
+import ru.touchin.db.models.Phone
+import ru.touchin.db.models.PhoneDao
+import ru.touchin.db.models.PhoneStampDao
+import ru.touchin.db.models.PhoneStamps
+import java.text.DateFormat
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module() {
     val database = DatabaseController
+    install(DefaultHeaders)
+
     routing {
-        get("/") {
-            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
+        install(CallLogging)
+        install(StatusPages) {
+            exception<IllegalStateException> { cause ->
+                call.respond(HttpStatusCode.InternalServerError)
+            }
+        }
+        install(ContentNegotiation) {
+            gson {
+                setDateFormat(DateFormat.LONG)
+                setPrettyPrinting()
+            }
         }
 
-        get("/html-dsl") {
+        post("/mobile/login") {
+            val phone = call.receiveOrNull<Phone>()
+            phone?.let {
+                transaction {
+                    PhoneDao.new(phone)
+                    call.respond(HttpStatusCode.OK)
+                }
+            } ?: call.respond(HttpStatusCode.BadRequest)
+        }
+
+        get("/mobile/list") {
+            val phoneStamps = transaction {
+                PhoneDao.all()
+                    .map {
+                        it to PhoneStampDao.find { PhoneStamps.phoneId eq it.id.value }.maxBy { it.date }
+                    }
+            }
             call.respondHtml {
                 body {
-                    h1 { +"HTML" }
-                    ul {
-                        for (n in 1..10) {
-                            li { +"$n" }
+                    table {
+                        thead {
+                            tr {
+                                td { +"ID" }
+                                td { +"ОС" }
+                                td { +"Модель" }
+                                td { +"Последний отпечаток" }
+                            }
                         }
+                        phoneStamps.forEach { (phone, stamp) ->
+                            tr {
+                                td { +phone.id.value }
+                                td { +"${phone.os.name} ${phone.osVersion}" }
+                                td { +phone.model }
+                                td { +(stamp?.let { Gson().toJson(stamp) } ?: "Нет отпечатков") }
+                            }
+                        }
+
                     }
                 }
             }

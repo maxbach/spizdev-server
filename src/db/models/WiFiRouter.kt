@@ -1,0 +1,25 @@
+package ru.touchin.db.models
+
+import org.jetbrains.exposed.dao.Entity
+import org.jetbrains.exposed.dao.EntityClass
+import org.jetbrains.exposed.dao.EntityID
+import org.jetbrains.exposed.dao.IdTable
+
+object WiFiRouters : IdTable<String>() {
+    override val id = varchar("wifi_id", 50).entityId().primaryKey()
+    val positionId = reference("wifi_position", OfficePositions)
+}
+
+class WiFiRouterDao(id: EntityID<String>) : Entity<String>(id) {
+
+    companion object : EntityClass<String, WiFiRouterDao>(WiFiRouters, WiFiRouterDao::class.java)
+
+    var position by OfficePositionDao referencedOn WiFiRouters.positionId
+
+}
+
+data class WiFiRouter(
+    val id: String,
+    val position: OfficePosition
+)
+
