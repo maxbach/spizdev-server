@@ -4,6 +4,7 @@ import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntIdTable
+import ru.touchin.api.models.Stamp
 
 object PhoneStamps : IntIdTable() {
     val phoneId = reference("stamp_phone_id", Phones.id)
@@ -26,9 +27,9 @@ class PhoneStampDao(id: EntityID<Int>) : IntEntity(id) {
 }
 
 data class PhoneStamp(
-    val id: Int,
-    val phone: Phone,
-    val batteryLevel: Float,
-    val gpsPosition: GpsPosition?,
+    override val id: Int,
+    override val phone: Phone,
+    override val batteryLevel: Float,
+    override val gpsPosition: GpsPosition?,
     val officePosition: OfficePosition?
-)
+) : Stamp(id, phone, batteryLevel, gpsPosition)

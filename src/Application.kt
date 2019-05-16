@@ -22,6 +22,7 @@ import io.ktor.routing.routing
 import kotlinx.css.*
 import kotlinx.html.*
 import org.jetbrains.exposed.sql.transactions.experimental.transaction
+import ru.touchin.api.models.SendStampBody
 import ru.touchin.db.DatabaseController
 import ru.touchin.db.models.Phone
 import ru.touchin.db.models.PhoneDao
@@ -56,6 +57,17 @@ fun Application.module() {
                     PhoneDao.new(phone)
                     call.respond(HttpStatusCode.OK)
                 }
+            } ?: call.respond(HttpStatusCode.BadRequest)
+        }
+
+        post("/mobile/stamp") {
+            val body = call.receiveOrNull<SendStampBody>()
+            body?.let {
+                // filter scans
+                // frequency and level to distance
+                // find Office Position
+                // add to database
+                // respond OK
             } ?: call.respond(HttpStatusCode.BadRequest)
         }
 

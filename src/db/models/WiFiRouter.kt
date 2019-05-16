@@ -6,7 +6,7 @@ import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IdTable
 
 object WiFiRouters : IdTable<String>() {
-    override val id = varchar("wifi_id", 50).entityId().primaryKey()
+    override val id = varchar("wifi_mac", 50).entityId().primaryKey()
     val positionId = reference("wifi_position", OfficePositions)
 }
 
@@ -19,7 +19,7 @@ class WiFiRouterDao(id: EntityID<String>) : Entity<String>(id) {
 }
 
 data class WiFiRouter(
-    val id: String,
+    val macAddress: String,
     val position: OfficePosition
 )
 

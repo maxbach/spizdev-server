@@ -30,6 +30,7 @@ dependencies {
     compile("org.jetbrains:kotlin-css-jvm:1.0.0-pre.31-kotlin-1.2.41")
     compile("org.jetbrains.exposed:exposed:0.13.7")
     compile("org.postgresql:postgresql:42.2.2")
+    compile ("org.apache.commons:commons-math3:3.6.1")
     implementation("io.ktor:ktor-gson:$ktor_version")
     testCompile("io.ktor:ktor-server-tests:$ktor_version")
 }
