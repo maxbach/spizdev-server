@@ -21,15 +21,15 @@ class PhoneStampDao(id: EntityID<Int>) : IntEntity(id) {
     var phone by PhoneDao referencedOn PhoneStamps.phoneId
     var date by PhoneStamps.date
     var batteryLevel by PhoneStamps.batteryLevel
-    var gpsPositionId by GpsPositionDao optionalReferencedOn PhoneStamps.gpsPositionId
-    var officePositionId by OfficePositionDao optionalReferencedOn PhoneStamps.officePositionId
+    var gpsPosition by GpsPositionDao optionalReferencedOn PhoneStamps.gpsPositionId
+    var officePosition by OfficePositionDao optionalReferencedOn PhoneStamps.officePositionId
 
 }
 
 data class PhoneStamp(
     override val id: Int,
-    override val phone: Phone,
     override val batteryLevel: Float,
     override val gpsPosition: GpsPosition?,
+    val phone: Phone,
     val officePosition: OfficePosition?
-) : Stamp(id, phone, batteryLevel, gpsPosition)
+) : Stamp(id, batteryLevel, gpsPosition)

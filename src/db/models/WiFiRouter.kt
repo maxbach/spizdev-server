@@ -16,6 +16,8 @@ class WiFiRouterDao(id: EntityID<String>) : Entity<String>(id) {
 
     var position by OfficePositionDao referencedOn WiFiRouters.positionId
 
+    fun toModel() = WiFiRouter(id.value, position.toModel())
+
 }
 
 data class WiFiRouter(

@@ -5,7 +5,6 @@ import ru.touchin.db.models.Phone
 
 abstract class Stamp(
     open val id: Int,
-    open val phone: Phone,
     open val batteryLevel: Float,
     open val gpsPosition: GpsPosition?
 )

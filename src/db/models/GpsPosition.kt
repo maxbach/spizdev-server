@@ -13,7 +13,15 @@ object GpsPositions : IntIdTable() {
 
 class GpsPositionDao(id: EntityID<Int>) : IntEntity(id) {
 
-    companion object : EntityClass<Int, GpsPositionDao>(GpsPositions, GpsPositionDao::class.java)
+    companion object : EntityClass<Int, GpsPositionDao>(GpsPositions, GpsPositionDao::class.java) {
+
+        fun new(gps: GpsPosition) = new {
+            x = gps.x
+            y = gps.y
+            error = gps.error
+        }
+
+    }
 
     var x by GpsPositions.x
     var y by GpsPositions.y
@@ -22,7 +30,6 @@ class GpsPositionDao(id: EntityID<Int>) : IntEntity(id) {
 }
 
 data class GpsPosition(
-    val id: Int,
     val x: Float,
     val y: Float,
     val error: Float

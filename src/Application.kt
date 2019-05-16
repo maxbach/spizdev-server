@@ -22,18 +22,16 @@ import io.ktor.routing.routing
 import kotlinx.css.*
 import kotlinx.html.*
 import org.jetbrains.exposed.sql.transactions.experimental.transaction
+import org.joda.time.DateTime
 import ru.touchin.api.models.SendStampBody
 import ru.touchin.db.DatabaseController
-import ru.touchin.db.models.Phone
-import ru.touchin.db.models.PhoneDao
-import ru.touchin.db.models.PhoneStampDao
-import ru.touchin.db.models.PhoneStamps
+import ru.touchin.db.models.*
 import java.text.DateFormat
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module() {
-    val database = DatabaseController
+    DatabaseController
     install(DefaultHeaders)
 
     routing {
@@ -62,12 +60,36 @@ fun Application.module() {
 
         post("/mobile/stamp") {
             val body = call.receiveOrNull<SendStampBody>()
+            val officeRouters = transaction { WiFiRouterDao.all().toList().map(WiFiRouterDao::toModel) }
             body?.let {
-                // filter scans
-                // frequency and level to distance
-                // find Office Position
-                // add to database
-                // respond OK
+                val phone = transaction { PhoneDao.findById(it.phoneId) }
+                if (phone == null) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@let
+                }
+                // добавить обработку ошибок с wifi
+                val position = CalculateUtils.calculateDevicePosition(
+                    body.wiFiScans
+                        .filterScansAndMapToRouter(officeRouters)
+                        ?.findBestRouters()
+                )
+                transaction {
+                    PhoneStampDao.new {
+                        gpsPosition = body.gpsPosition?.let(GpsPositionDao.Companion::new)
+                        this.phone = phone
+                        officePosition = position?.let {
+                            OfficePositionDao.new {
+                                x = position.first
+                                y = position.second
+                                floor = 5
+                            }
+                        }
+                        batteryLevel = body.batteryLevel
+                        date = DateTime.now()
+                    }
+                }
+                call.respond(HttpStatusCode.OK)
+
             } ?: call.respond(HttpStatusCode.BadRequest)
         }
 
@@ -102,6 +124,8 @@ fun Application.module() {
                 }
             }
         }
+
+        post("/mobile")
 
         get("/styles.css") {
             call.respondCss {
