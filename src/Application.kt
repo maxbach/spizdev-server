@@ -125,8 +125,6 @@ fun Application.module() {
             }
         }
 
-        post("/mobile")
-
         get("/styles.css") {
             call.respondCss {
                 body {
