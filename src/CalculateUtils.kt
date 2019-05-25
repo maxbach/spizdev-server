@@ -9,22 +9,26 @@ import ru.touchin.api.models.WiFiScan
 import ru.touchin.db.models.WiFiRouter
 import kotlin.math.pow
 
-fun List<WiFiScan>.filterScansAndMapToRouter(officeRouters: List<WiFiRouter>) = filter { wiFiScan ->
-    wiFiScan.name.contains("Touch Instinct")
-            && officeRouters.any { officeRouter -> officeRouter.macAddress == wiFiScan.macAddress }
-}
-    .takeIf { it.size >= 3 }
-    ?.mapNotNull { wiFiScan ->
-        val router = officeRouters.find { officeRouter ->
-            officeRouter.macAddress == wiFiScan.macAddress
-        }
-        router?.let { router to CalculateUtils.convertToDistance(wiFiScan.levelInDb, wiFiScan.frequencyInMhz) }
+private const val ROUTERS_MIN = 3
+
+fun List<WiFiScan>.filterScansAndMapToRouter(officeRouters: List<WiFiRouter>): List<Pair<WiFiRouter, Double>>? {
+    val officeRoutersMacs = officeRouters.map(WiFiRouter::macAddress)
+    return filter { wiFiScan ->
+        wiFiScan.name.contains("Touch Instinct") && wiFiScan.macAddress in officeRoutersMacs
     }
+        .takeIf { it.size >= ROUTERS_MIN }
+        ?.mapNotNull { wiFiScan ->
+            val router = officeRouters.find { officeRouter ->
+                officeRouter.macAddress == wiFiScan.macAddress
+            }
+            router?.let { router to CalculateUtils.convertToDistance(wiFiScan.levelInDb, wiFiScan.frequencyInMhz) }
+        }
+}
 
 fun List<Pair<WiFiRouter, Double>>.findBestRouters(): List<Pair<WiFiRouter, Double>> {
-    require(this.size >= 3)
-    return sortedByDescending { it.second }
-        .take(3)
+    require(this.size >= ROUTERS_MIN)
+    return sortedBy { it.second }
+        .take(ROUTERS_MIN)
 }
 
 object CalculateUtils {
@@ -36,10 +40,10 @@ object CalculateUtils {
 
     fun calculateDevicePosition(routersWithDistance: List<Pair<WiFiRouter, Double>>?): Pair<Double, Double>? {
         if (routersWithDistance == null) return null
-        require(routersWithDistance.size == 3)
+        require(routersWithDistance.size == ROUTERS_MIN)
         val bestPoint = NonLinearConjugateGradientOptimizer(
             NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
-            SimpleValueChecker(-1e-8, 1e-8)
+            SimpleValueChecker(1e-15, 1e-15)
         ).optimize(
             ObjectiveFunctionGradient {
                 val x = it[0]
@@ -55,10 +59,8 @@ object CalculateUtils {
                 routersWithDistance.sumByDouble { calculateFunction(it.first, it.second, x, y) }
             },
             InitialGuess(doubleArrayOf(
-                routersWithDistance.map { it.first.position.x }.average(),
-                routersWithDistance.map { it.first.position.y }.average()
+                0.0, 0.0
             )),
-            SimpleBounds.unbounded(2),
             MaxEval.unlimited(),
             MaxIter.unlimited()
         )

@@ -7,8 +7,8 @@ import org.jetbrains.exposed.dao.IdTable
 import ru.touchin.db.enums.PhoneOs
 
 object Phones : IdTable<String>() {
-    override val id = varchar("phone_id", 50).entityId().primaryKey()
-    val model = varchar("phone_model", 10)
+    override val id = varchar("phone_id", 50).primaryKey().entityId()
+    val model = varchar("phone_model", 50)
     val os = enumeration("phone_os", PhoneOs::class)
     val osVersion = varchar("phone_os_version", 10)
 }

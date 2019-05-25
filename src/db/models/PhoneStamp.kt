@@ -1,22 +1,19 @@
 package ru.touchin.db.models
 
-import org.jetbrains.exposed.dao.EntityClass
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntIdTable
-import ru.touchin.api.models.Stamp
+import org.jetbrains.exposed.dao.*
+import org.joda.time.DateTime
 
 object PhoneStamps : IntIdTable() {
-    val phoneId = reference("stamp_phone_id", Phones.id)
+    val phoneId = reference("stamp_phone", Phones)
     val date = datetime("stamp_date")
-    val batteryLevel = float("stamp_battery")
+    val batteryLevel = integer("stamp_battery")
     val gpsPositionId = reference("stamp_gps", GpsPositions).nullable()
     val officePositionId = reference("stamp_office", OfficePositions).nullable()
 }
 
 class PhoneStampDao(id: EntityID<Int>) : IntEntity(id) {
 
-    companion object : EntityClass<Int, PhoneStampDao>(PhoneStamps, PhoneStampDao::class.java)
+    companion object : IntEntityClass<PhoneStampDao>(PhoneStamps, PhoneStampDao::class.java)
 
     var phone by PhoneDao referencedOn PhoneStamps.phoneId
     var date by PhoneStamps.date
@@ -24,12 +21,22 @@ class PhoneStampDao(id: EntityID<Int>) : IntEntity(id) {
     var gpsPosition by GpsPositionDao optionalReferencedOn PhoneStamps.gpsPositionId
     var officePosition by OfficePositionDao optionalReferencedOn PhoneStamps.officePositionId
 
+    fun toModel() = PhoneStamp(
+        id.value,
+        batteryLevel,
+        gpsPosition?.toModel(),
+        date,
+        phone.toModel(),
+        officePosition?.toModel()
+    )
+
 }
 
 data class PhoneStamp(
-    override val id: Int,
-    override val batteryLevel: Float,
-    override val gpsPosition: GpsPosition?,
+    val id: Int,
+    val batteryLevel: Int,
+    val gpsPosition: GpsPosition?,
+    val date: DateTime,
     val phone: Phone,
     val officePosition: OfficePosition?
-) : Stamp(id, batteryLevel, gpsPosition)
+)

@@ -1,36 +1,35 @@
 package ru.touchin.db.models
 
-import org.jetbrains.exposed.dao.EntityClass
-import org.jetbrains.exposed.dao.EntityID
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntIdTable
+import org.jetbrains.exposed.dao.*
 
 object GpsPositions : IntIdTable() {
-    val x = float("gps_position_x")
-    val y = float("gps_position_y")
+    val latitude = double("gps_position_lat")
+    val longitude = double("gps_position_lng")
     val error = float("gps_position_error")
 }
 
 class GpsPositionDao(id: EntityID<Int>) : IntEntity(id) {
 
-    companion object : EntityClass<Int, GpsPositionDao>(GpsPositions, GpsPositionDao::class.java) {
+    companion object : IntEntityClass<GpsPositionDao>(GpsPositions, GpsPositionDao::class.java) {
 
         fun new(gps: GpsPosition) = new {
-            x = gps.x
-            y = gps.y
+            latitude = gps.latitude
+            longitude = gps.longitude
             error = gps.error
         }
 
     }
 
-    var x by GpsPositions.x
-    var y by GpsPositions.y
+    fun toModel() = GpsPosition(latitude, longitude, error)
+
+    var latitude by GpsPositions.latitude
+    var longitude by GpsPositions.longitude
     var error by GpsPositions.error
 
 }
 
 data class GpsPosition(
-    val x: Float,
-    val y: Float,
+    val latitude: Double,
+    val longitude: Double,
     val error: Float
 )

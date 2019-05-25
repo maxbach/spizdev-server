@@ -33,6 +33,7 @@ dependencies {
     compile ("org.apache.commons:commons-math3:3.6.1")
     implementation("io.ktor:ktor-gson:$ktor_version")
     testCompile("io.ktor:ktor-server-tests:$ktor_version")
+    implementation("io.ktor:ktor-client-logging:$ktor_version")
 }
 
 kotlin.sourceSets["main"].kotlin.srcDirs("src")

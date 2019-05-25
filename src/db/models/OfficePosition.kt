@@ -7,8 +7,8 @@ import org.jetbrains.exposed.dao.IntIdTable
 
 object OfficePositions : IntIdTable() {
     val floor = integer("office_position_floor")
-    val x = double("office_position_x")
-    val y = double("office_position_y")
+    val x = integer("office_position_x")
+    val y = integer("office_position_y")
     val error = double("office_position_error").nullable()
 }
 
@@ -39,7 +39,7 @@ class OfficePositionDao(id: EntityID<Int>) : IntEntity(id) {
 
 data class OfficePosition(
     val floor: Int,
-    val x: Double,
-    val y: Double,
+    val x: Int,
+    val y: Int,
     val error: Double?
 )
