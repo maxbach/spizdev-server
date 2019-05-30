@@ -1,5 +1,6 @@
 package ru.touchin.requests
 
+import extensions.toJson
 import io.ktor.application.call
 import io.ktor.html.respondHtml
 import io.ktor.http.HttpStatusCode
@@ -8,10 +9,10 @@ import io.ktor.routing.Route
 import io.ktor.routing.get
 import kotlinx.html.*
 import org.jetbrains.exposed.sql.transactions.experimental.transaction
+import org.joda.time.format.DateTimeFormat
 import ru.touchin.db.models.GpsPosition
 import ru.touchin.db.models.PhoneStamp
 import ru.touchin.db.models.PhoneStampDao
-import ru.touchin.utils.toJson
 
 object MapPage : BaseRequest() {
 
@@ -37,7 +38,7 @@ object MapPage : BaseRequest() {
         }
     }
 
-    fun buildPath(deviceId: String) = "$path?$STAMP_ID_QUERY_PARAMETER=$deviceId"
+    fun buildPath(stampId: String) = "$path?$STAMP_ID_QUERY_PARAMETER=$stampId"
 
     private fun buildHtmlPage(html: HTML, stamp: PhoneStamp) {
         with(html) {
@@ -46,12 +47,17 @@ object MapPage : BaseRequest() {
                 addScripts()
             }
             body {
-                +stamp.toJson()
+                h2 {
+                    +"${stamp.date.toString(DateTimeFormat.shortDateTime())} by ${stamp.phone.getFullName()}"
+                }
                 div {
                     id = "office_div"
                 }
                 if (stamp.gpsPosition != null && stamp.officePosition == null) {
                     addGoogleMap(stamp.gpsPosition)
+                }
+                p {
+                    +stamp.toJson()
                 }
             }
         }

@@ -39,4 +39,6 @@ data class Phone(
     val model: String,
     val os: PhoneOs,
     val osVersion: String
-)
+) {
+    fun getFullName() = "$model - ${os.name} $osVersion"
+}

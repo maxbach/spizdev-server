@@ -13,7 +13,7 @@ import ru.touchin.db.models.PhoneDao
 import ru.touchin.db.models.PhoneStamp
 import ru.touchin.db.models.PhoneStampDao
 import ru.touchin.db.models.PhoneStamps
-import ru.touchin.utils.toJson
+import extensions.toJson
 
 object DeviceHistoryPage : BaseRequest() {
 
@@ -52,26 +52,36 @@ object DeviceHistoryPage : BaseRequest() {
                 h2 {
                     +phone.getFullName()
                 }
-                table {
-                    thead {
-                        tr {
-                            td { +"Время" }
-                            td { +"Позиция в офисе" }
-                            td { +"Позиция в мире" }
-                            td { +"Уровень батареи" }
+                if (stampList.isNotEmpty()) {
+                    table {
+                        thead {
+                            tr {
+                                td { +"Время" }
+                                td { +"Позиция в офисе" }
+                                td { +"Позиция в мире" }
+                                td { +"Уровень батареи" }
+                            }
+                        }
+                        stampList.forEach { stamp ->
+                            tr {
+                                td {
+                                    if (stamp.gpsPosition != null || stamp.officePosition != null) {
+                                        a(MapPage.buildPath(stamp.id.toString())) {
+                                            +stamp.date.toString(DateTimeFormat.shortDateTime())
+                                        }
+                                    } else {
+                                        +stamp.date.toString(DateTimeFormat.mediumDateTime())
+                                    }
+                                }
+                                td { +(stamp.officePosition?.toJson() ?: "Отсутствует") }
+                                td { +(stamp.gpsPosition?.toJson() ?: "Отсутствует") }
+                                td { +stamp.batteryLevel.toString() }
+                            }
                         }
                     }
-                    stampList.forEach { stamp ->
-                        tr {
-                            td {
-                                a(MapPage.buildPath(stamp.id.toString())) {
-                                    +stamp.date.toString(DateTimeFormat.mediumDateTime())
-                                }
-                            }
-                            td { +(stamp.officePosition?.toJson() ?: "Отсутствует") }
-                            td { +(stamp.gpsPosition?.toJson() ?: "Отсутствует") }
-                            td { +stamp.batteryLevel.toString() }
-                        }
+                } else {
+                    p {
+                        + "От девайса еще не пришло никаких данных. Пиздите его, он что-то скрывает."
                     }
                 }
             }
