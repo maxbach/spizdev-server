@@ -4,6 +4,7 @@ import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IdTable
+import ru.touchin.extensions.getId
 
 object WiFiRouters : IdTable<String>() {
     override val id = varchar("wifi_mac", 50).entityId()
@@ -16,7 +17,7 @@ class WiFiRouterDao(id: EntityID<String>) : Entity<String>(id) {
 
     var position by OfficePositionDao referencedOn WiFiRouters.positionId
 
-    fun toModel() = WiFiRouter(id.value, position.toModel())
+    fun toModel() = WiFiRouter(getId(), position.toModel())
 
 }
 

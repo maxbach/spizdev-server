@@ -1,5 +1,5 @@
 package ru.touchin.db.enums
 
-enum class PhoneOs() {
+enum class PhoneOs {
     ANDROID, IOS;
 }

@@ -1,7 +1,11 @@
 package ru.touchin.db.models
 
-import org.jetbrains.exposed.dao.*
+import org.jetbrains.exposed.dao.EntityID
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.IntIdTable
 import org.joda.time.DateTime
+import ru.touchin.extensions.getId
 
 object PhoneStamps : IntIdTable() {
     val phoneId = reference("stamp_phone", Phones)
@@ -24,7 +28,7 @@ class PhoneStampDao(id: EntityID<Int>) : IntEntity(id) {
     var jsCode by PhoneStamps.jsCode
 
     fun toModel() = PhoneStamp(
-        id.value,
+        getId(),
         batteryLevel,
         gpsPosition?.toModel(),
         date,

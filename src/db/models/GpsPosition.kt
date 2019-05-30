@@ -1,6 +1,9 @@
 package ru.touchin.db.models
 
-import org.jetbrains.exposed.dao.*
+import org.jetbrains.exposed.dao.EntityID
+import org.jetbrains.exposed.dao.IntEntity
+import org.jetbrains.exposed.dao.IntEntityClass
+import org.jetbrains.exposed.dao.IntIdTable
 
 object GpsPositions : IntIdTable() {
     val latitude = double("gps_position_lat")

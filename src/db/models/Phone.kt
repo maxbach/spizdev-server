@@ -5,6 +5,7 @@ import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IdTable
 import ru.touchin.db.enums.PhoneOs
+import ru.touchin.extensions.getId
 
 object Phones : IdTable<String>() {
     override val id = varchar("phone_id", 50).primaryKey().entityId()
@@ -27,7 +28,9 @@ class PhoneDao(id: EntityID<String>) : Entity<String>(id) {
     var os by Phones.os
     var osVersion by Phones.osVersion
 
-    fun toModel(): Phone = Phone(id.value, model, os, osVersion)
+    fun toModel(): Phone = Phone(getId(), model, os, osVersion)
+
+    fun getFullName() = "$model - ${os.name} $osVersion"
 
 }
 
