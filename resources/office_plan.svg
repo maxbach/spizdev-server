@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <svg id="office_map" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 38587 15370">
-    <g fill="none" stroke="black" stroke-width="10">
+    <g fill="none" stroke="black" stroke-width="10" transform="translate(0, 15370) scale(1,-1) ">
         <path d="M0,9720 L8460,9720 L8460,9650 L0,9650 L0,9720 Z "/>
         <path d="M8460,7440 L31257,7440 L31257,8340 L8460,8340 L8460,7440 Z "/>
         <path d="M8460,15370 L8980,15370 L8980,7440 L8460,7440 L8460,15370 Z "/>

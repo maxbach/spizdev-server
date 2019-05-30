@@ -20,7 +20,7 @@ object DatabaseController {
         )
 
         transaction {
-//            SchemaUtils.drop(Phones, WiFiRouters, OfficePositions, GpsPositions, PhoneStamps)
+            SchemaUtils.drop(Phones, WiFiRouters, OfficePositions, GpsPositions, PhoneStamps)
             SchemaUtils.createMissingTablesAndColumns(Phones, WiFiRouters, OfficePositions, GpsPositions, PhoneStamps)
             transaction {
                 if (WiFiRouterDao.all().empty()) {
@@ -48,21 +48,21 @@ object DatabaseController {
                     WiFiRouterDao.new("b4:75:0e:47:c3:0f") {
                         position = OfficePositionDao.new {
                             x = 33500
-                            y = 4235
+                            y = 7550
                             floor = 5
                         }
                     }
                     WiFiRouterDao.new("f4:f2:6d:fb:fb:59") {
                         position = OfficePositionDao.new {
-                            x = 10700
-                            y = 15070
+                            x = 19817
+                            y = 11870
                             floor = 5
                         }
                     }
                     WiFiRouterDao.new("c4:6e:1f:99:b6:7d") {
                         position = OfficePositionDao.new {
-                            x = 19817
-                            y = 11870
+                            x = 10700
+                            y = 15070
                             floor = 5
                         }
                     }

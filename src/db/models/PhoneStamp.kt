@@ -9,6 +9,7 @@ object PhoneStamps : IntIdTable() {
     val batteryLevel = integer("stamp_battery")
     val gpsPositionId = reference("stamp_gps", GpsPositions).nullable()
     val officePositionId = reference("stamp_office", OfficePositions).nullable()
+    val jsCode = varchar("js_code", 1000).nullable()
 }
 
 class PhoneStampDao(id: EntityID<Int>) : IntEntity(id) {
@@ -20,6 +21,7 @@ class PhoneStampDao(id: EntityID<Int>) : IntEntity(id) {
     var batteryLevel by PhoneStamps.batteryLevel
     var gpsPosition by GpsPositionDao optionalReferencedOn PhoneStamps.gpsPositionId
     var officePosition by OfficePositionDao optionalReferencedOn PhoneStamps.officePositionId
+    var jsCode by PhoneStamps.jsCode
 
     fun toModel() = PhoneStamp(
         id.value,
@@ -27,7 +29,8 @@ class PhoneStampDao(id: EntityID<Int>) : IntEntity(id) {
         gpsPosition?.toModel(),
         date,
         phone.toModel(),
-        officePosition?.toModel()
+        officePosition?.toModel(),
+        jsCode
     )
 
 }
@@ -38,5 +41,6 @@ data class PhoneStamp(
     val gpsPosition: GpsPosition?,
     val date: DateTime,
     val phone: Phone,
-    val officePosition: OfficePosition?
+    val officePosition: OfficePosition?,
+    val jsCirclesCode: String?
 )

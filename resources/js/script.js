@@ -10,6 +10,30 @@ $(function() {
         stroke: "#000",
         strokeWidth: 5
       });
+      if (circle0X) {
+        var circle = snap.circle(circle0X, circle0Y, circle0R);
+        circle.attr({
+          stroke: "#000",
+          strokeWidth: 30,
+          fill: "none"
+        });
+      }
+      if (circle1X) {
+        var circle = snap.circle(circle1X, circle1Y, circle1R);
+        circle.attr({
+          stroke: "#000",
+          strokeWidth: 30,
+          fill: "none"
+        });
+      }
+      if (circle2X) {
+        var circle = snap.circle(circle2X, circle2Y, circle2R);
+        circle.attr({
+          stroke: "#000",
+          strokeWidth: 30,
+          fill: "none"
+        });
+      }
     });
   }
 });

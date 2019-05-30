@@ -14,7 +14,16 @@ object OfficePositions : IntIdTable() {
 
 class OfficePositionDao(id: EntityID<Int>) : IntEntity(id) {
 
-    companion object : EntityClass<Int, OfficePositionDao>(OfficePositions, OfficePositionDao::class.java)
+    companion object : EntityClass<Int, OfficePositionDao>(OfficePositions, OfficePositionDao::class.java) {
+
+        fun new(position: OfficePosition) = new {
+            floor = position.floor
+            x = position.x
+            y = position.y
+            error = position.error
+        }
+
+    }
 
     var floor by OfficePositions.floor
     var x by OfficePositions.x
@@ -27,13 +36,6 @@ class OfficePositionDao(id: EntityID<Int>) : IntEntity(id) {
         y,
         error
     )
-
-    fun new(position: OfficePosition) = new {
-        floor = position.floor
-        x = position.x
-        y = position.y
-        error = position.error
-    }
 
 }
 

@@ -16,7 +16,6 @@ import io.ktor.http.content.resource
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.request.receiveOrNull
-import io.ktor.request.receiveText
 import io.ktor.response.respond
 import io.ktor.response.respondText
 import io.ktor.routing.get
@@ -33,7 +32,6 @@ import ru.touchin.db.DatabaseController
 import ru.touchin.db.models.*
 import ru.touchin.utils.toJson
 import java.text.DateFormat
-import kotlin.math.roundToInt
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
@@ -82,26 +80,32 @@ fun Application.module() {
                     return@let
                 }
                 // добавить обработку ошибок с wifi
-                val position = CalculateUtils.calculateDevicePosition(
-                    body.wiFiScans
-                        .filterScansAndMapToRouter(officeRouters)
-                        ?.findBestRouters()
-                )
+                val routers = body.wiFiScans
+                    .convertToRouters(officeRouters)
+                    .findBestRouters()
+
+                val position = CalculateUtils.calculateDevicePosition(routers)
+
                 transaction {
                     PhoneStampDao.new {
                         this.phone = phone
-                        officePosition = position?.let {
-                            OfficePositionDao.new {
-                                x = position.first.roundToInt()
-                                y = position.second.roundToInt()
-                                floor = 5
-                            }
-                        }
+                        officePosition = position?.let(OfficePositionDao.Companion::new)
                         batteryLevel = body.batteryLevel
                         date = DateTime.now()
                         gpsPosition = body.gpsPosition?.let(GpsPositionDao.Companion::new)
+                        routers.takeIf { it.isNotEmpty() }?.let {
+                            jsCode = routers.mapIndexed { index, pair ->
+                                "let circle${index}X = ${pair.first.position.x};" +
+                                        "let circle${index}Y = ${pair.first.position.y};" +
+                                        "let circle${index}R = ${pair.second};"
+                            }.foldRight("") { acc, element ->
+                                acc + element
+                            }
+                        }
+
                     }
                 }
+
                 call.respond(HttpStatusCode.OK)
 
             } ?: call.respond(HttpStatusCode.BadRequest)
@@ -154,6 +158,7 @@ fun Application.module() {
                     PhoneStampDao
                         .find { PhoneStamps.phoneId eq phoneId }
                         .map(PhoneStampDao::toModel)
+                        .asReversed()
                 }
                 call.respondHtml {
                     body {
@@ -200,6 +205,11 @@ fun Application.module() {
                             if (stamp.officePosition != null) {
                                 script {
                                     +"let pointX = ${stamp.officePosition.x}; let pointY = ${stamp.officePosition.y};"
+                                }
+                            }
+                            stamp.jsCirclesCode?.let {
+                                script {
+                                    +it
                                 }
                             }
                             script(ScriptType.textJavaScript, src = "/static/script.js") {}
